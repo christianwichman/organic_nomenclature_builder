@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Organic Nomenclature Builder – Ver 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      line-height: 1.5;
+      color: #1f2933;
+      background-color: #e5f0ff;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 850px;
+      width: 100%;
+      margin: 24px;
+      padding: 24px 20px 28px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+
+    .tagline {
+      text-align: center;
+      margin-top: 4px;
+      margin-bottom: 20px;
+      color: #52606d;
+      font-size: 0.95rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .controls label {
+      font-size: 0.95rem;
+      color: #364152;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd2d9;
+      font-size: 0.95rem;
+      background: #f8fafc;
+    }
+
+    button {
+      border: none;
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+      transition: background 0.15s ease, transform 0.08s ease,
+        box-shadow 0.15s ease;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .secondary-btn {
+      background: #e5e7eb;
+      color: #111827;
+      box-shadow: none;
+    }
+
+    .secondary-btn:hover {
+      background: #d4d4d8;
+      box-shadow: none;
+    }
+
+    .card {
+      border-radius: 14px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 18px 16px 16px;
+      margin-bottom: 14px;
+    }
+
+    .prompt-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .prompt-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #374151;
+      min-width: 70px;
+    }
+
+    .prompt-value {
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+      background: #e0f2fe;
+      color: #0f172a;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+    }
+
+    .formula-note {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-left: 4px;
+    }
+
+    .input-row {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .input-row label {
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+
+    #answerInput {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #cbd5f5;
+      font-size: 0.96rem;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+        "Courier New", monospace;
+      background: #ffffff;
+    }
+
+    #answerInput:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: 1px;
+      border-color: #2563eb;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    #feedback {
+      font-size: 0.9rem;
+      min-height: 1.2em;
+    }
+
+    .feedback-correct {
+      color: #15803d;
+      font-weight: 600;
+    }
+
+    .feedback-incorrect {
+      color: #b91c1c;
+      font-weight: 500;
+    }
+
+    .feedback-neutral {
+      color: #4b5563;
+    }
+
+    .answer-area {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      background: #f1f5f9;
+      border-radius: 10px;
+      padding: 8px 10px;
+      border: 1px dashed #cbd5f5;
+    }
+
+    .answer-area-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .answer-line {
+      margin: 2px 0;
+    }
+
+    .explanation {
+      margin-top: 4px;
+      color: #475569;
+      font-size: 0.88rem;
+    }
+
+    .hint {
+      font-size: 0.9rem;
+      color: #4b5563;
+      background: #eff6ff;
+      border-radius: 12px;
+      border: 1px solid #bfdbfe;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+
+    .hint strong {
+      color: #1d4ed8;
+    }
+
+    .footer {
+      margin-top: 14px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 12px;
+        padding: 16px;
+      }
+
+      .buttons-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .prompt-value {
+        border-radius: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Organic Nomenclature Builder</h1>
+    <p class="tagline">
+      Practice going back and forth between
+      <strong>names</strong> and <strong>condensed structures</strong>.
+    </p>
+
+    <div class="controls">
+      <label for="modeSelect">
+        Mode:
+        <select id="modeSelect">
+          <option value="name-to-structure">Name → Structure</option>
+          <option value="structure-to-name">Structure → Name</option>
+        </select>
+      </label>
+      <button id="newBtn">New Molecule</button>
+    </div>
+
+    <div class="card">
+      <div id="promptArea"></div>
+
+      <div class="input-row">
+        <label id="inputLabel" for="answerInput">
+          Your answer:
+        </label>
+        <input
+          id="answerInput"
+          type="text"
+          autocomplete="off"
+          placeholder="Type your answer and press Enter or 'Check'"
+        />
+      </div>
+
+      <div class="buttons-row">
+        <button id="checkBtn">Check</button>
+        <button id="showBtn" class="secondary-btn">Show Answer</button>
+        <span id="feedback" class="feedback-neutral"></span>
+      </div>
+
+      <div id="answerArea" class="answer-area" style="display: none;"></div>
+    </div>
+
+    <div class="hint">
+      <strong>Tip for students:</strong>
+      Use prefixes like <em>meth-, eth-, prop-, but-, pent-</em> and suffixes
+      like <em>-ane, -ene, -yne, -ol, -one, -oic acid</em>. Remember: choose the
+      <em>longest parent chain</em> and number from the end closest to the
+      functional group or multiple bond.
+    </div>
+
+    <div class="footer">
+      Ver 1 &mdash; Add or edit molecules in the JavaScript section to customize
+      for your class.
+    </div>
+  </div>
+
+  <script>
+    // ---------- Utility functions ----------
+
+    function normalizeName(str) {
+      return str
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/[-–—]/g, "-") // normalize hyphens
+        .replace(/[,]/g, "");
+    }
+
+    function normalizeCondensed(str) {
+      return str
+        .toUpperCase()
+        .replace(/\s+/g, "")
+        .replace(/[-–—]/g, "-") // normalize hyphens/dashes
+        .replace(/-/g, "");
+    }
+
+    // ---------- Molecule data ----------
+    // Each molecule has:
+    // - iupac: canonical IUPAC name
+    // - altNames: other acceptable names
+    // - displayCondensed: pretty version for display (with subscripts/dashes)
+    // - answerCondensed: array of acceptable condensed formulas (plain text)
+    // - formula: optional molecular formula for interest
+    // - explanation: short teaching blurb
+
+    const molecules = [
+      {
+        id: 1,
+        iupac: "butane",
+        altNames: ["n-butane"],
+        displayCondensed: "CH₃–CH₂–CH₂–CH₃",
+        answerCondensed: ["CH3-CH2-CH2-CH3", "CH3CH2CH2CH3"],
+        formula: "C₄H₁₀",
+        explanation:
+          "Four-carbon straight-chain alkane (no branches, only single bonds).",
+      },
+      {
+        id: 2,
+        iupac: "2-methylpropane",
+        altNames: ["isobutane"],
+        displayCondensed: "CH₃–CH(CH₃)–CH₃",
+        answerCondensed: ["CH3-CH(CH3)-CH3", "CH3CH(CH3)CH3"],
+        formula: "C₄H₁₀",
+        explanation:
+          "Three-carbon parent chain (propane) with a methyl branch on C-2.",
+      },
+      {
+        id: 3,
+        iupac: "pentane",
+        altNames: [],
+        displayCondensed: "CH₃–CH₂–CH₂–CH₂–CH₃",
+        answerCondensed: ["CH3-CH2-CH2-CH2-CH3", "CH3CH2CH2CH2CH3"],
+        formula: "C₅H₁₂",
+        explanation: "Five-carbon straight-chain alkane.",
+      },
+      {
+        id: 4,
+        iupac: "2-methylbutane",
+        altNames: ["isopentane"],
+        displayCondensed: "CH₃–CH(CH₃)–CH₂–CH₃",
+        answerCondensed: ["CH3-CH(CH3)-CH2-CH3", "CH3CH(CH3)CH2CH3"],
+        formula: "C₅H₁₂",
+        explanation:
+          "Four-carbon parent chain (butane) with a methyl branch on C-2.",
+      },
+      {
+        id: 5,
+        iupac: "2-pentene",
+        altNames: ["pent-2-ene"],
+        displayCondensed: "CH₃–CH=CH–CH₂–CH₃",
+        answerCondensed: ["CH3-CH=CH-CH2-CH3", "CH3CH=CHCH2CH3"],
+        formula: "C₅H₁₀",
+        explanation:
+          "Five-carbon chain with a C=C double bond between C-2 and C-3.",
+      },
+      {
+        id: 6,
+        iupac: "propene",
+        altNames: ["prop-1-ene"],
+        displayCondensed: "CH₂=CH–CH₃",
+        answerCondensed: ["CH2=CH-CH3", "CH2=CHCH3"],
+        formula: "C₃H₆",
+        explanation:
+          "Three-carbon chain with one double bond (an alkene).",
+      },
+      {
+        id: 7,
+        iupac: "ethanol",
+        altNames: ["ethyl alcohol"],
+        displayCondensed: "CH₃–CH₂–OH",
+        answerCondensed: ["CH3-CH2-OH", "CH3CH2OH"],
+        formula: "C₂H₆O",
+        explanation:
+          "Two-carbon chain with a terminal –OH group (primary alcohol).",
+      },
+      {
+        id: 8,
+        iupac: "propan-2-ol",
+        altNames: ["2-propanol", "isopropanol", "isopropyl alcohol"],
+        displayCondensed: "CH₃–CH(OH)–CH₃",
+        answerCondensed: ["CH3-CH(OH)-CH3", "CH3CH(OH)CH3"],
+        formula: "C₃H₈O",
+        explanation:
+          "Three-carbon chain with an –OH group on the middle carbon (secondary alcohol).",
+      },
+      {
+        id: 9,
+        iupac: "butan-2-one",
+        altNames: ["2-butanone", "methyl ethyl ketone"],
+        displayCondensed: "CH₃–CO–CH₂–CH₃",
+        answerCondensed: ["CH3-CO-CH2-CH3", "CH3COCH2CH3"],
+        formula: "C₄H₈O",
+        explanation:
+          "Four-carbon chain with a carbonyl group (C=O) on C-2 (a ketone).",
+      },
+      {
+        id: 10,
+        iupac: "ethanoic acid",
+        altNames: ["acetic acid"],
+        displayCondensed: "CH₃–COOH",
+        answerCondensed: ["CH3-COOH", "CH3COOH"],
+        formula: "C₂H₄O₂",
+        explanation:
+          "Two-carbon chain ending in a carboxylic acid group (–COOH).",
+      },
+      {
+        id: 11,
+        iupac: "methyl ethanoate",
+        altNames: ["methyl acetate"],
+        displayCondensed: "CH₃–COO–CH₃",
+        answerCondensed: ["CH3-COO-CH3", "CH3COOCH3"],
+        formula: "C₃H₆O₂",
+        explanation:
+          "An ester formed from methanol and ethanoic acid (alkyl alkanoate).",
+      },
+    ];
+
+    // Precompute normalized acceptable answers for speed and cleanliness
+    molecules.forEach((m) => {
+      m.acceptableNamesNorm = [m.iupac, ...(m.altNames || [])].map(
+        (name) => normalizeName(name)
+      );
+      m.acceptableCondNorm = (m.answerCondensed || []).map((cond) =>
+        normalizeCondensed(cond)
+      );
+    });
+
+    // ---------- State ----------
+    let currentMolecule = null;
+
+    const modeSelect = document.getElementById("modeSelect");
+    const newBtn = document.getElementById("newBtn");
+    const checkBtn = document.getElementById("checkBtn");
+    const showBtn = document.getElementById("showBtn");
+    const promptArea = document.getElementById("promptArea");
+    const inputLabel = document.getElementById("inputLabel");
+    const answerInput = document.getElementById("answerInput");
+    const feedback = document.getElementById("feedback");
+    const answerArea = document.getElementById("answerArea");
+
+    // ---------- Core functions ----------
+
+    function pickRandomMolecule() {
+      const index = Math.floor(Math.random() * molecules.length);
+      currentMolecule = molecules[index];
+    }
+
+    function renderPrompt() {
+      if (!currentMolecule) return;
+
+      clearFeedback();
+      hideAnswerArea();
+      answerInput.value = "";
+
+      const mode = modeSelect.value;
+
+      if (mode === "name-to-structure") {
+        promptArea.innerHTML = `
+          <div class="prompt-row">
+            <div class="prompt-label">Name:</div>
+            <div class="prompt-value">${currentMolecule.iupac}</div>
+          </div>
+          <div class="prompt-row">
+            <span class="formula-note">
+              Write a <strong>condensed structural formula</strong> (e.g. CH3-CH2-CH3).
+            </span>
+          </div>
+        `;
+        inputLabel.textContent = "Your answer (condensed structural formula):";
+        answerInput.placeholder = "e.g. CH3-CH2-CH2-CH3";
+      } else {
+        // structure-to-name
+        promptArea.innerHTML = `
+          <div class="prompt-row">
+            <div class="prompt-label">Structure:</div>
+            <div class="prompt-value">${currentMolecule.displayCondensed}</div>
+          </div>
+          <div class="prompt-row">
+            <span class="formula-note">
+              Molecular formula: ${currentMolecule.formula || "–"}
+            </span>
+          </div>
+        `;
+        inputLabel.textContent = "Your answer (IUPAC name):";
+        answerInput.placeholder = "e.g. 2-methylpropane";
+      }
+
+      answerInput.focus();
+    }
+
+    function clearFeedback() {
+      feedback.textContent = "";
+      feedback.className = "feedback-neutral";
+    }
+
+    function showFeedbackCorrect(message) {
+      feedback.textContent = message;
+      feedback.className = "feedback-correct";
+    }
+
+    function showFeedbackIncorrect(message) {
+      feedback.textContent = message;
+      feedback.className = "feedback-incorrect";
+    }
+
+    function showFeedbackNeutral(message) {
+      feedback.textContent = message;
+      feedback.className = "feedback-neutral";
+    }
+
+    function showAnswer() {
+      if (!currentMolecule) return;
+
+      answerArea.style.display = "block";
+      answerArea.innerHTML = `
+        <div class="answer-area-title">Correct answer(s):</div>
+        <div class="answer-line"><strong>Name:</strong> ${
+          currentMolecule.iupac
+        }</div>
+        ${
+          currentMolecule.altNames && currentMolecule.altNames.length
+            ? `<div class="answer-line"><strong>Also accepted:</strong> ${currentMolecule.altNames.join(
+                ", "
+              )}</div>`
+            : ""
+        }
+        <div class="answer-line"><strong>Condensed structure:</strong> ${
+          currentMolecule.displayCondensed
+        }</div>
+        <div class="answer-line"><strong>Molecular formula:</strong> ${
+          currentMolecule.formula || "–"
+        }</div>
+        <div class="explanation">${currentMolecule.explanation}</div>
+      `;
+    }
+
+    function hideAnswerArea() {
+      answerArea.style.display = "none";
+      answerArea.innerHTML = "";
+    }
+
+    function checkAnswer() {
+      if (!currentMolecule) return;
+
+      const userInputRaw = answerInput.value.trim();
+      if (!userInputRaw) {
+        showFeedbackNeutral("Type an answer first 🙂");
+        answerInput.focus();
+        return;
+      }
+
+      const mode = modeSelect.value;
+
+      if (mode === "name-to-structure") {
+        const normalized = normalizeCondensed(userInputRaw);
+        const isCorrect = currentMolecule.acceptableCondNorm.includes(
+          normalized
+        );
+        if (isCorrect) {
+          showFeedbackCorrect("Nice! Your condensed structure is correct ✅");
+        } else {
+          showFeedbackIncorrect(
+            "Not quite. Check your carbon chain, branching, and hydrogens."
+          );
+        }
+      } else {
+        // structure-to-name
+        const normalized = normalizeName(userInputRaw);
+        const isCorrect = currentMolecule.acceptableNamesNorm.includes(
+          normalized
+        );
+        if (isCorrect) {
+          showFeedbackCorrect("Yes! That is an acceptable name ✅");
+        } else {
+          showFeedbackIncorrect(
+            "Not quite. Check the parent chain length, numbering, and functional group."
+          );
+        }
+      }
+    }
+
+    // ---------- Event listeners ----------
+
+    newBtn.addEventListener("click", () => {
+      pickRandomMolecule();
+      renderPrompt();
+    });
+
+    modeSelect.addEventListener("change", () => {
+      // Keep the same molecule but re-render in the new mode
+      if (!currentMolecule) {
+        pickRandomMolecule();
+      }
+      renderPrompt();
+    });
+
+    checkBtn.addEventListener("click", () => {
+      checkAnswer();
+    });
+
+    showBtn.addEventListener("click", () => {
+      showAnswer();
+    });
+
+    answerInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        checkAnswer();
+      }
+    });
+
+    // ---------- Initial load ----------
+    pickRandomMolecule();
+    renderPrompt();
+  </script>
+</body>
+</html>
